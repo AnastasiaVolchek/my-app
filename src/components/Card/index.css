@@ -99,6 +99,10 @@
 	display: flex;
 }
 
+.card__favorite_active {
+	fill: red;
+}
+
 .card__cart {
 	margin-top: auto;
 }
@@ -145,9 +149,9 @@
 	background-color: #01A54E;
 	color: #FFFFFF;
 }
-svg {
+/* svg {
     fill: red;
-}
+} */
 .card__liked > svg {
   fill: red;
 }
