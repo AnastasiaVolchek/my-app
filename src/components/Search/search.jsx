@@ -6,6 +6,6 @@ export const Search = ({setSearchQuery, searchQuery}) => {
     placeholder="Поиск"
     onChange={(e) => setSearchQuery(e.target.value)}
     className="search__input"
-    value={searchQuery}
+    value={searchQuery ?? ''}
     />)
 }

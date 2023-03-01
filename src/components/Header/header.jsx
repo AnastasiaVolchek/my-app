@@ -1,9 +1,19 @@
+import React, {useState, useEffect, useContext } from 'react';
+import { UserContext } from '../../context/userContext';
 import { Logo } from "../Logo/logo";
 import { Search } from "../Search/search";
+import IconBasket from "./basketMaterial/BasketMaterial";
 import "./style.css";
 
-export const Header = ({setSearchQuery, searchQuery, user}) => {
+export const Header = () => {
+const {currentUser, searchQuery, setSearchQuery, parentCounter} = useContext(UserContext);
+const [counter, setCounter] = useState(parentCounter);
 
+    useEffect(() => {
+      setCounter((st) => st + 1);
+
+      return () => setCounter(parentCounter) 
+    }, [parentCounter]);
 
     return (
         <div className = "header" id="head">
@@ -15,9 +25,10 @@ export const Header = ({setSearchQuery, searchQuery, user}) => {
                         searchQuery={searchQuery} 
                         setSearchQuery={setSearchQuery}/>
                     </div>
+                    <div>  <IconBasket count={counter} /> </div>
                     <div>
-                    <span>{user.email} {" "}</span>
-                    <span>{user.about}</span>
+                    <span>{currentUser.email} {" "}</span>
+                    <span>{currentUser.about}</span>
                     </div>
                 </div>
             </div>

@@ -1,15 +1,23 @@
+import React, { useContext } from "react";
+import { CardContext } from "../../context/cardContext";
 import { Card } from "../Card/card";
 import "./index.css";
 
-import { useEffect, useState } from "react";
+export const CardList = () => {
 
-export const CardList = ( {currentUser, cards, handleProductLike} ) => {
+    const {cards, setParentCounter, handleProductLike} = useContext(CardContext)
 
     return (
     <div className="cards">
         {cards.map((item) => {
-        //  console.log({ item });
-           return <Card currentUser={currentUser} product={item} onProductLike={handleProductLike} {...item} key={item._id} />; // rest operator
+        return (
+            <Card
+              product={item}
+              onProductLike={handleProductLike}
+              setParentCounter={setParentCounter}
+              {...item}
+              key={item._id}
+            />);
         })}
 
     </div>
