@@ -7,8 +7,9 @@ import { useContext, useEffect, useState } from "react";
 import { api } from "../../utils/api";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
+import { findLike } from "../../utils/utils";
 
-const product_id = "63ecf77059b98b038f77b65f";
+// const product_id = "63ecf77059b98b038f77b65f";
 
 export const Product = ({id, handleProductLike, setParentCounter }) => {
   const [product, setProduct] = useState({});
@@ -20,11 +21,11 @@ export const Product = ({id, handleProductLike, setParentCounter }) => {
 const navigate = useNavigate();
 
 const {currentUser} = useContext(UserContext);
-const isLiked = product?.likes?.some((el) => el === currentUser._id);
+const isLiked = findLike(product, currentUser);
 
-const handleLike = () => {
-  handleProductLike(product)
-}
+// const handleLike = () => {
+//   handleProductLike(product)
+// }
 
  // const clicker = () => {
   //   api.addLike().catch((res) =>
@@ -36,7 +37,7 @@ const handleLike = () => {
   // const matches = useMatches();
 
 
-  console.log({ navigate, location, params });
+  // console.log({ navigate, location, params });
 
   useEffect(()=>{
     if (location.search.includes('budget=3000')) {
@@ -75,7 +76,7 @@ const handleLike = () => {
             </button>
           </div>
           <button
-          onClick={handleLike} 
+          // onClick={handleLike} 
           className={cn(s.favorite, { [s.favoriteActive]: isLiked })}>
             <Save />
             <span>{isLiked ? "В избранном" : "В избранное"} </span>

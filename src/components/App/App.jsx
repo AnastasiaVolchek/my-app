@@ -3,12 +3,15 @@ import { Footer } from '../Footer/footer';
 import { Header } from '../Header/header';
 import './App.css';
 import { api } from "../../utils/api";
-import { useDebounce } from "../../utils/utils";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import { ProductPage } from "../../pages/ProductPage/ProductPage";
-import { CatalogPage } from "../../pages/CatalogPage/CatalogPage";
+import { findLike, useDebounce } from "../../utils/utils";
+import { Route, Routes } from "react-router-dom";
+import { ProductPage } from "../../pages/Product/ProductPage";
+import { CatalogPage } from "../../pages/Catalog/CatalogPage";
 import { UserContext } from "../../context/userContext.js";
 import { CardContext } from "../../context/cardContext.js";
+import { FaqPage } from "../../pages/FAQ/FaqPage";
+import { NotFound } from "../../pages/NotFound/NotFound";
+import { Favorites } from "../../pages/Favorites/Favorites";
 
 
 function App() {
@@ -16,10 +19,12 @@ function App() {
   const [searchQuery, setSearchQuery] = useState(undefined);
   const [parentCounter, setParentCounter] = useState(0);
   const [currentUser, setCurrentUser] = useState({})
+  const [favorites, setFavorites] = useState([])
 
 
-  const filteredCards = (products, id) => 
-  products.filter((e) => e.author._id === id);
+  const filteredCards = (products, id) => {
+  return products.filter((e) => e.author._id === id);
+  };
   const handleSearch = (search) => {
     api.searchProducts(search).then((data) => setCards(filteredCards(data, currentUser._id)));
   };
@@ -28,20 +33,27 @@ function App() {
 
 
 
+  // функция по наж/отж лайка
   function handleProductLike(product) {
-    const isLiked = product.likes.some((el) => el === currentUser._id);
+    // узнаем , отлайкан ли продукт
+    const isLiked = findLike(product, currentUser);
     isLiked
-      ? api.deleteLike(product._id).then((newCard) => {
+      ? // Если товар был с лайком, значит было действие по удалению лайка
+        api.deleteLike(product._id).then((newCard) => {
+          // newCard - карточка с уже изм кол-вом лайков
           const newCards = cards.map((e) =>
             e._id === newCard._id ? newCard : e
           );
           setCards(filteredCards(newCards, currentUser._id));
+          setFavorites((state) => state.filter((f) => f._id !== newCard._id));
         })
-      : api.addLike(product._id).then((newCard) => {
+      : // Если не отлайкан, значит действие было сов-но для доб-я лайка.
+        api.addLike(product._id).then((newCard) => {
           const newCards = cards.map((e) =>
             e._id === newCard._id ? newCard : e
           );
           setCards(filteredCards(newCards, currentUser._id));
+          setFavorites((favor) => [...favor, newCard]);
         });
   }
 
@@ -52,11 +64,19 @@ function App() {
   }, [debounceValueInApp]);
 
 
+  // Первонач загрузка продуктов и данных юзера
   useEffect(() => {
     Promise.all([api.getUserInfo(), api.getProductList()]).then(
       ([userData, productData]) => {
+        // сетим юзера
         setCurrentUser(userData);
-        setCards(filteredCards(productData.products, userData._id));
+        const items = filteredCards(productData.products, userData._id);
+        // сетим карточки
+        setCards(items);
+        // получаем отлайканные нами карточки
+        const fav = items.filter((e) => findLike(e, userData));
+        // сетим карточки в избранный стейт
+        setFavorites(fav);
       }
     );
   }, []);
@@ -71,10 +91,8 @@ function userEdit(userUpdate) {
 });
 }
 
-const navigate = useNavigate();
 
 const setSortCards = (sort) => {
-  console.log(sort)
   if (sort === 'cheapest') {
     const newCards = cards.sort((a,b)=> a.price - b.price);
     setCards([...newCards]);
@@ -106,7 +124,7 @@ const onProductDelete = async (id) => {
 }
 
 const contextValue  = {setSort: setSortCards, currentUser, searchQuery, setSearchQuery, setParentCounter, parentCounter}
-const contextCardValue = { cards, setParentCounter, handleProductLike, onProductDelete}
+const contextCardValue = { cards, setParentCounter, handleProductLike, onProductDelete, favorites, setFavorites}
 
 
   return (
@@ -119,23 +137,17 @@ const contextCardValue = { cards, setParentCounter, handleProductLike, onProduct
       <button onClick={()=>clickMe()}>Добавить новый продукт</button>
       <button onClick={()=>userEdit()}>Изменить данные пользователя</button>
       <Routes>
-        <Route 
-        path="/"
-        element={
-         <CatalogPage />
-        } 
-         >
+        <Route path="/" element={ <CatalogPage /> } 
+        ></Route>
+        <Route path="/product/:productId" element={<ProductPage />}>
         </Route>
-        <Route 
-        path="/product/:productId" 
-        element={<ProductPage />}>
+        <Route path="/fakeRout/:productId" element={<ProductPage />}>
         </Route>
-        <Route 
-        path="/fakeRout/:productId" 
-        element={<ProductPage />}>
+        <Route path="faq" element={<FaqPage />}>
         </Route>
-        <Route 
-        path="*" element={<div>404 not found <button onClick={()=>navigate("/")}>Home</button></div>}>
+        <Route path="favorites" element={<Favorites />}>
+        </Route>
+        <Route path="*" element={<NotFound/>}>
         </Route>
       </Routes>
 

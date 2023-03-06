@@ -3,9 +3,9 @@ import { CardContext } from "../../context/cardContext";
 import { Card } from "../Card/card";
 import "./index.css";
 
-export const CardList = () => {
+export const CardList = ({cards}) => {
 
-    const {cards, setParentCounter, handleProductLike} = useContext(CardContext)
+    const {setParentCounter, handleProductLike} = useContext(CardContext)
 
     return (
     <div className="cards">

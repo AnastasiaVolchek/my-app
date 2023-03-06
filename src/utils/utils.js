@@ -9,15 +9,15 @@ export const getIssues = (numb) => {
 
   export const useDebounce = (searchQuery, delay = 500) => {
     const [debounceValue, setDebounceValue] = useState(searchQuery);
-    console.log({searchQuery});
   
     useEffect(()=>{
       const timeout = setTimeout(() => {
         setDebounceValue(searchQuery);
       }, delay);
   
-      console.log({timeout});
       return () => clearTimeout(timeout)
     }, [searchQuery]);
     return debounceValue;
   }
+
+  export const findLike = (product, currentUser) => product?.likes?.some((el) => el === currentUser._id);

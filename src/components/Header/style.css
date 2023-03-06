@@ -31,3 +31,28 @@
 .logo-app {
 
 }
+
+.header__liked {
+	fill: transparent;
+	stroke: black;
+	stroke-width: 0.5px
+}
+.header__bubble {
+  background-color: #01A54E;
+  color: white;
+  font-size: 11px;
+  width: 19px;
+  height: 14px;
+  border-radius: 30px;
+  position: absolute;
+  left: 60%;
+  bottom: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+.header__bubble-link {
+  text-decoration: none;
+position: relative;
+}

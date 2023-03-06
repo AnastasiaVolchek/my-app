@@ -101,6 +101,13 @@
 
 .card__favorite_active {
 	fill: red;
+	stroke-width: 1px;
+}
+
+.card__favorite_not_active{
+	fill: transparent;
+	stroke: black;
+	stroke-width: 0.5px;
 }
 
 .card__cart {

@@ -6,6 +6,7 @@ import "./index.css";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
 import { CardContext } from "../../context/cardContext";
+import { findLike } from "../../utils/utils";
 
 export const Card = ({ 
     product, 
@@ -19,7 +20,7 @@ export const Card = ({
     const {currentUser} = React.useContext(UserContext);
     const {onProductDelete} = React.useContext(CardContext);
   
-    const isLiked = product.likes.some ((el) => el === currentUser._id );
+    const isLiked = findLike(product, currentUser);
     const handleLikeClick = () => {
         onProductLike(product);
     }
@@ -35,7 +36,7 @@ export const Card = ({
             </div>
             <div className="card__sticky card__sticky_type_top-right">
                 <button 
-                    className={`card__favorite ${isLiked ? "card__favorite_active" : ""}`}
+                    className={`card__favorite ${isLiked ? "card__favorite_active" : "card__favorite_not_active"}`}
                     onClick={handleLikeClick}>
                     <Like className="card__liked"/>
                 </button>
