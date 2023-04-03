@@ -14,11 +14,11 @@
 	color: #000;
 	font-size: 16px;
 	line-height: 20px;
-	caret-color: #FEBA0C;
+	caret-color: #a7f28c;
 }
 .search__input:focus {
 	background: #FFFFFF;
-	border: 1px solid #FED700;
+	border: 1px solid #a7f28c;
 }
 
 .search__input::placeholder {
@@ -42,10 +42,10 @@
 	fill: #CFD8DC;
 }
 .search__btn:focus svg{
-	fill: #FEBA0C;
+	fill: #a7f28c;
 }
 .search__btn:hover svg{
-	fill: #FEBA0C;
+	fill: #a7f28c;
 }
 
 @media (max-width: 350px) {

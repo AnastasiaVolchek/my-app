@@ -14,7 +14,7 @@ export const Footer = () => {
             <div className="footer__wrapper">
             <div className="footer__col">
                 <Logo className="footer__logo"/>
-                <p className="footer__copyright">© «Интернет-магазин DogFood.ru»</p>
+                <p className="footer__copyright">© «Интернет-магазин MarioShop.ru»</p>
             </div>
             <div className="footer__col">
                 <nav className="menu-bottom">

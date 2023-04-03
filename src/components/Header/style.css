@@ -1,8 +1,8 @@
 .header {
     width: 100%;
-    background-color: #FFE44D;
+    background-color: #a7f28c;
     padding: 12px 0;
-
+    flex: 0 0 auto;
 
 }
 
@@ -55,4 +55,8 @@
 .header__bubble-link {
   text-decoration: none;
 position: relative;
+}
+.header__link {
+    text-decoration: none;
+
 }

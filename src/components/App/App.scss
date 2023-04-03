@@ -1,0 +1,24 @@
+ .marioLogo{
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  color: rgb(33, 184, 33)
+ }
+
+.btn {
+  // background-color: red;
+  // color: white; 
+  // border: 2px solid green; 
+  &:focus,
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.not__auth {
+  display: flex;
+  min-height: 505px;
+  flex: 1 0 auto;
+  justify-content: center;
+  align-items: center;
+}

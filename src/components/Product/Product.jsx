@@ -1,64 +1,134 @@
-import s from "./index.module.css";
+import s from "./index.module.scss";
 import truck from "./img/truck.svg";
 import quality from "./img/quality.svg";
 import cn from "classnames";
 import { ReactComponent as Save } from "./img/save.svg";
-import { useContext, useEffect, useState } from "react";
+import { ReactComponent as Basket } from "./img/basket.svg";
+import { useEffect, useState } from "react";
 import { api } from "../../utils/api";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { UserContext } from "../../context/userContext";
-import { findLike } from "../../utils/utils";
+import { useNavigate } from "react-router-dom";
+import { Rating } from "../Rating/Rating";
+import { Form } from "../Form/form";
+import { useForm } from "react-hook-form";
+import { BaseButton } from "../BaseButton/BaseButton";
+import { openNotification} from "../Notification/Notification"
 
-// const product_id = "63ecf77059b98b038f77b65f";
 
-export const Product = ({id, handleProductLike, setParentCounter }) => {
-  const [product, setProduct] = useState({});
+
+export const Product = ({ id, product, reviews, onProductLike, currentUser, setParentCounter, onSendReview, onDeleteReview }) => {
+  const [rate, setRate] = useState(3);
+  const [users, setUsers] = useState([]);
   const [productCount, setProductCount] = useState(0);
-  useEffect(()=>{
-    api.getProductById(id).then((data) => setProduct(data));
-  }, [id]);
+  const [currentRating, setCurrentRating] = useState(0);
+  const [reviewsProduct, setReviewsProduct] = useState(reviews);
+  const [showForm, setShowForm] = useState(false)
 
-const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    reset,
+  } = useForm({ mode: "onSubmit" });
 
-const {currentUser} = useContext(UserContext);
-const isLiked = findLike(product, currentUser);
+  const sendReview = async (data) => {
+    try {
+    const newProduct = await api.addReview(product._id, { text: data.review, rating: rate })
+    onSendReview(newProduct)
+    // setReviewsProduct(state => [...newProduct.reviews])
+    setShowForm(false)
+    reset();
+      openNotification("success", "Успешно", "Ваш отзыв успешно отправлен");
+    } catch (error) {
+      openNotification("error", "error", "Ваш отзыв отправить не удалось");
 
-// const handleLike = () => {
-//   handleProductLike(product)
-// }
-
- // const clicker = () => {
-  //   api.addLike().catch((res) =>
-  //       res.status === 403 ?   navigate('/') : navigate('/login')
-  //   )
-  // }
-  const location = useLocation();
-  const params = useParams();
-  // const matches = useMatches();
-
-
-  // console.log({ navigate, location, params });
-
-  useEffect(()=>{
-    if (location.search.includes('budget=3000')) {
-      // navigate('/part1')
-      // alert('you are really rich man');
     }
-  },[]);
+  }
 
-  // useEffect(()=>{
-  //   if (params.productId) {
-  //     navigate(`/product/${params.productId}`)
-  //     // alert('you are really rich man');
-  //   }
-  // },[params.productId]);
+  const navigate = useNavigate();
+
+  const [isLikedProduct, setIsLikedProduct] = useState(false);
+
+  const getUser = (id) => {
+    if (!users.length) return 'User';
+    let user = users.find(e => e._id === id);
+    if (user?.avatar.includes("default-image")) {
+      user = { ...user, avatar: "https://avatars.mds.yandex.net/i?id=a32f6e4531729888530a1d696b82419730039a72-5477942-images-thumbs&ref=rim&n=33&w=225&h=225" }
+    }
+    return user
+  }
+
+  const deleteReview = async (id) => {
+    try {
+    const res = await onDeleteReview(id)
+    // setReviewsProduct(()=>[...res.reviews])
+    openNotification("success", "Успешно", "Ваш отзыв успешно удален");
+      
+    } catch (error) {
+      openNotification("error", "Ошибка", "Ваш отзыв удалить не получилось");
+      
+    }
+  }
+
+  const options = {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }
+
+  const onLike = (e) => {
+    onProductLike(product);
+    // setIsLikedProduct(state => !state)
+  }
+
+  const textRegister = register("review", {
+    required: "Review обязателен",
+  })
+
+  const hideReviews = () => {
+    setReviewsProduct(()=>[...reviews.slice(0,2)])
+  }
+
+  const showMore = () => {
+    setReviewsProduct((state)=>[...reviews.slice(0, state.length + 2)])
+  }
+
+  useEffect(()=> {
+    setReviewsProduct(()=>reviews)
+  }, [reviews])  
+
+  useEffect(() => {
+    const isLiked = product?.likes?.some((el) => el === currentUser._id);
+    setIsLikedProduct(isLiked)
+  }, [product.likes])
+
+
+  useEffect(() => {
+    if (!product?.reviews) return;
+    const rateAcc = product.reviews.reduce((acc, el) => acc = acc + el.rating, 0)
+    const accum = (Math.floor(rateAcc / product.reviews.length))
+    setRate(accum)
+    setCurrentRating(accum)
+  }, [product, product?.reviews]);
+
+  useEffect(() => {
+    api.getUsers().then((data) => setUsers(data))
+  }, [])
+
 
   return (
     <>
+      <div>
+        <span className="auth__info" onClick={() => navigate(-1)}> {"<"}Назад</span>
+        <h1>{product.name}</h1>
+        <div className={s.rateInfo}>
+          <span>Art <b>2388907</b></span>
+          <Rating rate={currentRating} setRate={() => { }} />
+          <span>{product?.reviews?.length} отзывов</span>
+        </div>
+      </div>
       <div className={s.product}>
         <div className={s.imgWrapper}>
           <img className={s.img} src={product.pictures} alt={`Изображение`} />
-          {product.tags?.map((e)=> <span className={`tag tag_type_${e}`}>{e}</span>)}
+          {product.tags?.map((e) => <span key={e} className={`tag tag_type_${e}`}>{e}</span>)}
         </div>
         <div className={s.desc}>
           <span className={s.price}>{product.price}&nbsp;₽</span>
@@ -67,19 +137,17 @@ const isLiked = findLike(product, currentUser);
           </span>)}
           <div className={s.btnWrap}>
             <div className={s.left}>
-              <button className={s.minus} onClick={()=> productCount > 0 && setProductCount((s) => s - 1)}>-</button>
+              <button className={s.minus} onClick={() => productCount > 0 && setProductCount((s) => s - 1)}>-</button>
               <span className={s.num}>{productCount}</span>
-              <button className={s.plus} onClick={()=>setProductCount((s) => s + 1)}>+</button>
+              <button className={s.plus} onClick={() => setProductCount((s) => s + 1)}>+</button>
             </div>
-            <button onClick={()=>setParentCounter((state)=> state + productCount) } className={`btn btn_type_primary ${s.cart}`}>
+            <button onClick={() => setParentCounter((state) => state + productCount)} className={`btn btn_type_primary ${s.cart}`}>
               В корзину
             </button>
           </div>
-          <button
-          // onClick={handleLike} 
-          className={cn(s.favorite, { [s.favoriteActive]: isLiked })}>
+          <button className={cn(s.favorite, { [s.favoriteActive]: isLikedProduct })} onClick={(e) => onLike(e)}>
             <Save />
-            <span>{isLiked ? "В избранном" : "В избранное"} </span>
+            <span>{isLikedProduct ? "В избранном" : "В избранное"} </span>
           </button>
           <div className={s.delivery}>
             <img src={truck} alt="truck" />
@@ -129,6 +197,46 @@ const isLiked = findLike(product, currentUser);
             <p>Следует учесть высокую калорийность продукта.</p>
           </div>
         </div>
+      </div>
+      <div>
+        <div className={s.review__wrapper}>
+          <button className="btn" onClick={() => setShowForm(true)}>Добавить отзыв</button>
+          {showForm &&
+            <Form className={s.review__form} submitForm={handleSubmit(sendReview)}>
+              <Rating rate={rate} isEditable={true} setRate={setRate} />
+              <span>Оставьте ваш отзыв</span>
+              <textarea
+                placeholder="Ваш отзыв"
+                className={s.review__form__text}
+                {...textRegister}
+              />
+              <BaseButton color="yellow" type="submit">send Review</BaseButton>
+            </Form>
+          }
+          <div className={s.review__show_more}>
+          <span onClick={showMore}>Еще отзывы</span>
+          <span onClick={hideReviews}>Скрыть отзывы</span>
+          </div>
+        </div>
+        {users && reviewsProduct
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .map((r) => <div key={r._id} className={s.review}>
+          <div className={s.review__author}>
+            <div className={s.review__info}>
+              <img className={s.review__avatar} src={getUser(r.author)?.avatar} alt="avatar" />
+              <span>{getUser(r.author)?.name ?? "User"}</span>
+              <span className={s.review__date}>{new Date(r.created_at).toLocaleString("ru", options)} </span>
+            </div>
+            <Rating rate={r.rating} isEditable={false} />
+          </div>
+          <div className={s.text}>
+            <span>
+              {r.text}
+            </span>
+            {currentUser._id === r.author &&
+            <Basket onClick={()=>deleteReview(r._id)} className={s.text__img}/>}
+          </div>
+        </div>)}
       </div>
     </>
   );
