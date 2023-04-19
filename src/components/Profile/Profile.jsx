@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import { UserContext } from "../../context/userContext";
 import { api } from "../../utils/api";
 import { Form } from "../Form/form";
-import InputBase from "../BaseInput/input";
 import "./index.scss"
 import { useForm } from "react-hook-form";
 import { BaseButton } from "../BaseButton/BaseButton";
@@ -12,7 +11,7 @@ import { openNotification } from "../Notification/Notification";
 export const Profile = () => {
 
     const { currentUser, setCurrentUser } = useContext(UserContext);
-    const [isEdit, setIsEdit] = useState(false);
+    // const [isEdit, setIsEdit] = useState(false);
     const {
         register,
         handleSubmit,
@@ -20,9 +19,9 @@ export const Profile = () => {
     } = useForm({ mode: "onSubmit" });
 
     const navigate = useNavigate();
-    const handleChangeAvatar = async () => {
-      await api.updateAvatar({ avatar: "https://get.wallhere.com/photo/food-love-heart-photography-blue-coffee-drink-circle-emotion-color-eye-hand-finger-computer-wallpaper-sweetness-human-body-organ-close-up-macro-photography-86555.jpg" })
-    }
+    // const handleChangeAvatar = async () => {
+    //   await api.updateAvatar({ avatar: "https://get.wallhere.com/photo/food-love-heart-photography-blue-coffee-drink-circle-emotion-color-eye-hand-finger-computer-wallpaper-sweetness-human-body-organ-close-up-macro-photography-86555.jpg" })
+    // }
 
     const sendProfileData = async (data) => {
         console.log(data);
@@ -53,6 +52,11 @@ export const Profile = () => {
         }
     }
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/login")
+    }
+
     return <div className="profile">
         <div className="auth__info" onClick={() => navigate(-1)}> {"< "} Назад </div>
             <h1>
@@ -66,6 +70,7 @@ export const Profile = () => {
                 <input {...register("email")} className="auth__input" disabled defaultValue={currentUser?.email} placeholder="email" />
                 <input {...register("id")} className="auth__input" disabled defaultValue={currentUser?._id} placeholder="id" />
                 <BaseButton type="submit" color={"yellow"} >Отправить</BaseButton>
+                <BaseButton color={'yellow'} onClick={handleLogout}>Выйти</BaseButton>
             </div>
         </Form>
 

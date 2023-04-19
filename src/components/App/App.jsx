@@ -33,34 +33,41 @@ function App() {
   const [isAuthentificated, setIsAuthentificated] = useState(false)
 
 
-
+ // функция, которая фильтрует продукты по автору (выдает только мои продукты)
   const filteredCards = (products, id) => {
     return products.filter((e) => e.author._id === id);
-    // return products
+    // return products (выводит все продукты)
   };
+
+  //поиск товаров
+  //Функция принимает один аргумент search, который является строкой поискового запроса
+  //отправляем запрос на поиск товаров, затем фильтруем по автору, затем меняем стейт
   const handleSearch = (search) => {
     api.searchProducts(search).then((data) => setCards(filteredCards(data, currentUser._id)));
   };
 
+  //задержка при поиске 
+  //Хук useDebounce задерживает изменение значения переменной на определенное время 
   const debounceValueInApp = useDebounce(searchQuery, 500);
-
 
 
   // функция по наж/отж лайка
   function handleProductLike(product) {
-    // узнаем , отлайкан ли продукт был
+    // Функция findLike - узнаем , отлайкан ли продукт был (принимает объект продукта и текущего юзера)
     const isLiked = findLike(product, currentUser);
      isLiked
-      ? // Если товар был с лайком, значит было действие по удалению лайка
+      ? // Если товар уже лайкнут, то переменная isLiked будет равна true => надо удалить лайк
       api.deleteLike(product._id).then((newCard) => {
-        // newCard - карточка с уже изм кол-вом лайков
+        // newCard - карточка с уже измененным кол-вом лайков
         const newCards = cards.map((e) =>
           e._id === newCard._id ? newCard : e
         );
+        // отфильтрованные карточки товаров будут обновлены в состоянии компонента с помощью setCards
         setCards(filteredCards(newCards, currentUser._id));
+        //также если мы удалили лайк, то обновится список избранных товаров с помощью setFavorites
         setFavorites((state) => state.filter((f) => f._id !== newCard._id));
       })
-      : // Если не отлайкан, значит действие было сов-но для доб-я лайка.
+      : // Если не отлайкан, значит действие было совершено для добавления лайка.
       api.addLike(product._id).then((newCard) => {
         const newCards = cards.map((e) =>
           e._id === newCard._id ? newCard : e
@@ -71,14 +78,16 @@ function App() {
       return isLiked
   }
 
-
+//для обновления карточек товаров в приложении при каждом изменении значения переменной debounceValueInApp
   useEffect(() => {
     if (debounceValueInApp === undefined) return;
     handleSearch(debounceValueInApp);
   }, [debounceValueInApp]);
 
 
-  // Первонач загрузка продуктов и данных юзера
+  // Первонач загрузка продуктов и данных юзера (когда оба запроса выполнятся успешно)
+  // Обновление при каждом изменении статуса аутентификации 
+
   useEffect(() => {
     Promise.all([api.getUserInfo(), api.getProductList()]).then(
       ([userData, productData]) => {
@@ -87,45 +96,50 @@ function App() {
         const items = filteredCards(productData.products, userData._id);
         // сетим карточки
         setCards(items);
-        // получаем отлайканные нами карточки
+        // + получаем отлайканные нами карточки
         const fav = items.filter((e) => findLike(e, userData));
-        // сетим карточки в избранный стейт
+        // и сетим карточки в избранное
         setFavorites(fav);
       }
     );
   }, [isAuthentificated]);
 
-  const clickMe = async () => {
-    await api.addProduct();
-  }
+  // const clickMe = async () => {
+  //   await api.addProduct();
+  // }
 
+  // function userEdit(userUpdate) {
+  //   api.setUserInfo(userUpdate).then((newUserData) => {
+  //     setCurrentUser(newUserData)
+  //   });
+  // }
 
-  function userEdit(userUpdate) {
-    api.setUserInfo(userUpdate).then((newUserData) => {
-      setCurrentUser(newUserData)
-    });
-  }
-
-
+//Сортировка товаров
+//Функция принимает аргумент sort, который является типом сортировки товаров
+//Внутри функции происходит проверка значения аргумента sort, и соответсвенно сортировка
+//затем обновляется состояние компонента с помощью метода setCards, который принимает новый массив карточек товаров
   const setSortCards = (sort) => {
-    if (sort === 'cheapest') {
+    if (sort === 'подешевле') {
       const newCards = cards.sort((a, b) => a.price - b.price);
       setCards([...newCards]);
     }
-    if (sort === 'richest') {
+    if (sort === 'подороже') {
       const newCards = cards.sort((a, b) => b.price - a.price);
       setCards([...newCards]);
     }
-    if (sort === 'popular') {
+    if (sort === 'популярные') {
       const newCards = cards.sort((a, b) => b.likes.length - a.likes.length);
       setCards([...newCards]);
     }
-    if (sort === 'newest') {
+    if (sort === 'новинки') {
       const newCards = cards.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
       setCards([...newCards]);
     }
   }
 
+  //Удаление товара
+  //Если удаление прошло успешно, то из состояния компонента удаляется карточка товара
+  //Остаются только те, у которых id не равен id удаленного товара
   const onProductDelete = async (id) => {
     try {
       const res = await api.deleteProduct(id)
@@ -136,21 +150,19 @@ function App() {
     }
   }
 
+  //Контекст
   const contextValue = { setSort: setSortCards, currentUser, setCurrentUser, searchQuery, setSearchQuery, setParentCounter, parentCounter, isAuthentificated }
   const contextCardValue = { cards, setParentCounter, handleProductLike, onProductDelete, favorites, setFavorites }
 
   const navigate = useNavigate();
-  const location = useLocation();
 
+  //при каждом срабатывании функции navigate - попытка получения токена из локального хранилища с помощью localStorage.getItem("token")
+  //Если токен найден, то isAuthentificated = true, пользователь аутентифицирован
   useEffect(()=>{
     const token = localStorage.getItem("token")
-    // const authPath = ["/reset-password", "/register"]
     if (token) {
       setIsAuthentificated(true)
     } 
-    // else if (!authPath.includes(location.pathname)) {
-    //   navigate("/login")
-    // }
   }, [navigate]);
 
   return (
@@ -161,10 +173,8 @@ function App() {
           {isAuthentificated ?
           <main className="content container">
             <div className="marioLogo">
-              <h3>AMIIBO SUPER MARIO SHOP</h3>
+              <h3>Магазин игрушек Amiibo - коллекция Супер Марио </h3>
             </div>
-            {/* <button onClick={() => clickMe()}>Добавить новый продукт</button> */}
-            {/* <button onClick={() => userEdit()}>Изменить данные пользователя</button> */}
             <Routes>
               <Route path="/" element={<CatalogPage />}
               ></Route>

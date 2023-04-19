@@ -16,3 +16,8 @@ export const Modal = ({ activeModal, children, setShowModal }) => {
         </>
     )
 }
+
+// возвращает элементы, которые отображают модальное окно.
+//classnames позволяет  задавать классы элементам в зависимости от условий.
+//"modal" - имя класса, { ["active"]: activeModal } - объект, который добавляет класс "active", если значение activeModal - тру.
+//stopPropagation - чтобы клики на элементе div не приводили к закрытию окна.

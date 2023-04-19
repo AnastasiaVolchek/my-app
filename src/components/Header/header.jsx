@@ -8,24 +8,28 @@ import IconBasket from "./basketMaterial/BasketMaterial";
 import "./style.css";
 import { ReactComponent as Like } from "../Card/like.svg"
 import { ReactComponent as LoginIcon } from "./images/login.svg"
+import { ReactComponent as Chart } from "./images/charts.svg"
+import { ReactComponent as Profile } from "./images/profile.svg"
+import { ReactComponent as Create } from "./images/create.svg"
+import { Modal } from '../Modal/Modal';
+import { CreateProduct } from '../CreateProduct/CreateProduct';
 
-export const Header = ({ setShowModal }) => {
+export const Header = ({ setShowModal, activeModal }) => {
+
     const { currentUser, searchQuery, setSearchQuery, parentCounter, isAuthentificated } = useContext(UserContext);
-    const [counter, setCounter] = useState(parentCounter);
     const { favorites } = useContext(CardContext);
 
+    const [counter, setCounter] = useState(parentCounter);
+    const [isCreateModuleActive, setCreateModal] = useState(false);
+    
     useEffect(() => {
         setCounter((st) => st + 1);
-
         return () => setCounter(parentCounter)
     }, [parentCounter]);
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        navigate("/login")
-    }
+
 
     return (
         <div className="header" id="head">
@@ -50,16 +54,18 @@ export const Header = ({ setShowModal }) => {
                         <LoginIcon />
                     </Link> :
                         <Link to={"/profile"} className="header__link" onClick={() => setShowModal(true)}>
-                            Profile
+                            <Profile/>
                         </Link>
                     }
-                    {/* <div>
-                        <span>{currentUser.email} {" "}</span>
-                        <span>{currentUser.about}</span>
-                    </div> */}
                         <Link to={"/chart"} className="header__link" >
-                            Chart
+                            <Chart/>
                         </Link>
+                        <span onClick={()=>setCreateModal(true)} className="header__link" >
+                            <Create/>
+                        </span>
+                        <Modal activeModal={isCreateModuleActive} setShowModal={setCreateModal}>
+                            <CreateProduct setCreateModal={setCreateModal} >Создать новый продукт</CreateProduct>
+                        </Modal>
                 </div>
             </div>
         </div>

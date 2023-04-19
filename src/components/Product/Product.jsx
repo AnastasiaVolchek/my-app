@@ -154,16 +154,16 @@ export const Product = ({ id, product, reviews, onProductLike, currentUser, setP
             <div className={s.right}>
               <h3 className={s.name}>Доставка по всему Миру!</h3>
               <p className={s.text}>
-                Доставка курьером — <span className={s.bold}>от 399 ₽</span>
+                Доставка курьером — <span className={s.bold}> от 399 ₽</span>
               </p>
             </div>
           </div>
           <div className={s.delivery}>
             <img src={quality} alt="quality" />
             <div className={s.right}>
-              <h3 className={s.name}>Доставка по всему Миру!</h3>
+              <h3 className={s.name}>Самовывоз бесплатно!</h3>
               <p className={s.text}>
-                Доставка курьером — <span className={s.bold}>от 399 ₽</span>
+                Доставка до пункта выдачи — <span className={s.bold}> 0 ₽</span>
               </p>
             </div>
           </div>
@@ -176,25 +176,22 @@ export const Product = ({ id, product, reviews, onProductLike, currentUser, setP
         <h2 className={s.title}>Характеристики</h2>
         <div className={s.grid}>
           <div className={s.naming}>Вес</div>
-          <div className={s.description}>1 шт 120-200 грамм</div>
-          <div className={s.naming}>Цена</div>
-          <div className={s.description}>490 ₽ за 100 грамм</div>
-          <div className={s.naming}>Польза</div>
+          <div className={s.description}>1 шт 190-290 грамм</div>
+          {/* <div className={s.naming}>Цена</div>
+          <div className={s.description}>490 ₽ за 100 грамм</div> */}
+          <div className={s.naming}>Особенности</div>
           <div className={s.description}>
             <p>
-              Большое содержание аминокислот и микроэлементов оказывает
-              положительное воздействие на общий обмен веществ собаки.
+            Необычная игрушка из легендарной серии «Марио», которая может быть интегрирована с твоей приставкой.
             </p>
-            <p>Способствуют укреплению десен и жевательных мышц.</p>
+            <p>Она совместима с консолями производства Nintendo (Wii U, New3DS и XL, 2DS и 3DS).</p>
             <p>
-              Развивают зубочелюстной аппарат, отвлекают собаку во время смены
-              зубов.
+            Для подключения просто нужно дотронуться фигуркой до метки NFC, и данные будут тут же переданы в видеоигру.
             </p>
             <p>
-              Имеет цельную волокнистую структуру, при разжевывание получается
-              эффект зубной щетки, лучше всего очищает клыки собак.
+            Персонаж со временем получит новые навыки и в полной мере раскроет свои способности.
             </p>
-            <p>Следует учесть высокую калорийность продукта.</p>
+            <p>Сделай его героем сражений вместе с другими виртуальными соратниками.</p>
           </div>
         </div>
       </div>

@@ -29,8 +29,8 @@ class Api {
         this._freshHeaders = data.freshHeaders
     }
     
-    getProductList(page=1) {
-        return fetch (`${this._baseUrl}/products?page=${page}`, {
+    getProductList() {
+        return fetch (`${this._baseUrl}/products`, {
             ...this._freshHeaders(),
         }).then((res) => onResponse(res));
     }
@@ -39,20 +39,11 @@ class Api {
             ...this._freshHeaders(),
         }).then((res) => onResponse(res));
     }
-    addProduct() {
+    addProduct(data) {
         return fetch (`${this._baseUrl}/products`, {
             ...this._freshHeaders(),
             method: "POST",
-            body: JSON.stringify({
-                "name": "Фигурка Пич Невеста",
-                "price": 4800,
-                "discount": 6,
-                "wight": "200 г",
-                "description": "Интерактивная фигурка Amiibo Super Mario Collection Пич Невеста, высотой 11 см, совместима с Nintendo Switch",
-                "available": true,
-                "stock": 1,
-                "pictures": "https://starfriend.ru/upload/iblock/11f/xwk4rqicuzi9rjgie30q28ic70z9yeio.jpg" 
-            }),
+            body: JSON.stringify(data),
         }).then((res) => onResponse(res));
     }
     deleteProduct(productId) {

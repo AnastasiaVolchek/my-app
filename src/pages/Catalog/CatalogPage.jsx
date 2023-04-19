@@ -10,7 +10,7 @@ export const CatalogPage = () => {
     const {searchQuery, setSort} = useContext(UserContext);
     const {cards} = useContext(CardContext)
 
-    const sortedItems = [{id: "newest"}, {id: "popular"}, {id: "cheapest"}, {id: "richest"}]
+    const sortedItems = [{id: "новинки"}, {id: "популярные"}, {id: "подешевле"}, {id: "подороже"}]
 
 
     return <>

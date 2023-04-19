@@ -45,7 +45,6 @@ export const Card = ({
             <img src={pictures} alt="card__image" className="card__image"/>
             <div className="card__desc">
                 <span className="card__price">{price}руб</span>
-                {/* <span className="card__wight">1pc</span> */}
                 <p className="card__name">{name}</p>
             </div>
         </Link>
