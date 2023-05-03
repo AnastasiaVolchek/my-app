@@ -4,7 +4,7 @@ import quality from "./img/quality.svg";
 import cn from "classnames";
 import { ReactComponent as Save } from "./img/save.svg";
 import { ReactComponent as Basket } from "./img/basket.svg";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { api } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import { Rating } from "../Rating/Rating";
@@ -12,16 +12,19 @@ import { Form } from "../Form/form";
 import { useForm } from "react-hook-form";
 import { BaseButton } from "../BaseButton/BaseButton";
 import { openNotification} from "../Notification/Notification"
+import { CardContext } from "../../context/cardContext";
 
 
 
-export const Product = ({ id, product, reviews, onProductLike, currentUser, setParentCounter, onSendReview, onDeleteReview }) => {
+export const Product = ({ id, product, reviews, onProductLike, currentUser, onSendReview, onDeleteReview }) => {
   const [rate, setRate] = useState(3);
   const [users, setUsers] = useState([]);
   const [productCount, setProductCount] = useState(0);
   const [currentRating, setCurrentRating] = useState(0);
   const [reviewsProduct, setReviewsProduct] = useState(reviews);
   const [showForm, setShowForm] = useState(false)
+
+  const {setParentCounter} = useContext(CardContext)
 
   const {
     register,
@@ -47,12 +50,18 @@ export const Product = ({ id, product, reviews, onProductLike, currentUser, setP
 
   const [isLikedProduct, setIsLikedProduct] = useState(false);
 
-  const getUser = (id) => {
+  const getUser = (author) => {
     if (!users.length) return 'User';
-    let user = users.find(e => e._id === id);
-    if (user?.avatar.includes("default-image")) {
-      user = { ...user, avatar: "https://avatars.mds.yandex.net/i?id=a32f6e4531729888530a1d696b82419730039a72-5477942-images-thumbs&ref=rim&n=33&w=225&h=225" }
+
+    let user = "https://ob-kassa.ru/content/front/buhoskol_tmp1/images/reviews-icon.jpg";
+    if (typeof author === 'object' && author !== null) {
+      user = users.find(e => e._id === author._id);
+      if (user?.avatar.includes("default-image")) {
+        user = { ...user, avatar: "https://avatars.mds.yandex.net/i?id=a32f6e4531729888530a1d696b82419730039a72-5477942-images-thumbs&ref=rim&n=33&w=225&h=225" }
+      }
     }
+
+
     return user
   }
 
@@ -145,6 +154,7 @@ export const Product = ({ id, product, reviews, onProductLike, currentUser, setP
               В корзину
             </button>
           </div>
+            <h6 className="card__link">Доступно: {product.stock} шт.</h6>
           <button className={cn(s.favorite, { [s.favoriteActive]: isLikedProduct })} onClick={(e) => onLike(e)}>
             <Save />
             <span>{isLikedProduct ? "В избранном" : "В избранное"} </span>
@@ -177,8 +187,6 @@ export const Product = ({ id, product, reviews, onProductLike, currentUser, setP
         <div className={s.grid}>
           <div className={s.naming}>Вес</div>
           <div className={s.description}>1 шт 190-290 грамм</div>
-          {/* <div className={s.naming}>Цена</div>
-          <div className={s.description}>490 ₽ за 100 грамм</div> */}
           <div className={s.naming}>Особенности</div>
           <div className={s.description}>
             <p>
@@ -230,7 +238,7 @@ export const Product = ({ id, product, reviews, onProductLike, currentUser, setP
             <span>
               {r.text}
             </span>
-            {currentUser._id === r.author &&
+            {currentUser._id === r.author._id &&
             <Basket onClick={()=>deleteReview(r._id)} className={s.text__img}/>}
           </div>
         </div>)}

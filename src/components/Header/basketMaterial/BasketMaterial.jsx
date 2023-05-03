@@ -17,7 +17,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export default function IconBasket({ count, clickFunction }) {
   return (
-    <div onClick={()=>clickFunction()}>
+    <div >
       <IconButton aria-label='cart'>
         <Badge badgeContent={count} color='secondary'>
           <ShoppingCartIcon />

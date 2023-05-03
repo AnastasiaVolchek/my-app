@@ -1,60 +1,70 @@
 import * as echarts from "echarts";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import "./index.scss"
+import { CardContext } from "../../context/cardContext";
 
 export const Chart = () =>{
 
+const {cards} = useContext(CardContext);
+
+const arr = cards.map(item => ({
+  name: item?.name,
+  value: item?.stock
+}));
+
+const sum = arr.reduce((accumulator, current) => accumulator + current.value, 0);
+
+arr.push({
+  // make an record to fill the bottom 50%
+  value: sum,
+  itemStyle: {
+    // stop the chart from rendering this piece
+    color: 'none',
+    decal: {
+      symbol: 'none'
+    }
+  },
+  label: {
+    show: false
+  }
+});
+
+console.log(arr);
     useEffect (()=>{
-
-
-     const option = {
+            
+      const option = {
         title: {
-              text: 'Доступное количество товара, шт.'
+        text: ''   
             },
         tooltip: {
           trigger: 'item'
         },
         legend: {
           top: '5%',
-          left: 'center'
+          left: 'center',
+          // doesn't perfectly work with our tricks, disable it
+          selectedMode: false
         },
         series: [
           {
-            name: 'Количество, доступное для заказа',
+            name: 'Доступно',
             type: 'pie',
             radius: ['40%', '70%'],
-            avoidLabelOverlap: false,
-            itemStyle: {
-              borderRadius: 10,
-              borderColor: '#fff',
-              borderWidth: 2
-            },
+            center: ['50%', '70%'],
+            // adjust the start angle
+            startAngle: 180,
             label: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 40,
-                fontWeight: 'bold'
+              show: true,
+              formatter(param) {
+                // correct the percentage
+                return param.name + ' (' + param.value + ' шт.)';
               }
             },
-            labelLine: {
-              show: false
-            },
-            data: [
-              { value: 2, name: "Марио"},
-              { value: 6, name: 'Пич' },
-              { value: 1, name: 'Луиджи' },
-              { value: 3, name: 'Тоад' },
-              { value: 2, name: 'Баузер' },
-              { value: 2, name: 'Купа' },
-              { value: 8, name: 'Растение' },
-              { value: 6, name: 'Йоша' }
-            ]
+            data: arr
           }
         ]
       };
+
 
     const chartDom = document.getElementById("chartsId");
     const myChart = echarts.init(chartDom)
@@ -65,7 +75,8 @@ export const Chart = () =>{
       },[])
 
     return <div>
-        <div style={{width: "600px", height: "500px"}} id="chartsId"></div>
+      <h3 className="chart__name"> Доступное количество товара</h3>
+        <div className="chart" id="chartsId"></div>
     </div>
 }
 // Внутри хука useEffect происходит инициализация графика с помощью библиотеки echarts. 

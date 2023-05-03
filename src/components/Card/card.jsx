@@ -1,7 +1,5 @@
-
 import React from "react";
 import { ReactComponent as Like } from "./like.svg"
-
 import "./index.css";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
@@ -10,7 +8,8 @@ import { findLike } from "../../utils/utils";
 
 export const Card = ({ 
     product, 
-    pictures, 
+    pictures,
+    stock, 
     name, 
     discount, 
     price, 
@@ -19,11 +18,16 @@ export const Card = ({
 }) => {
     const {currentUser} = React.useContext(UserContext);
     const {onProductDelete} = React.useContext(CardContext);
-  
+    
+    //isLiked вычисляется с помощью функции findLike, которая проверяет, есть ли у текущего пользователя лайк на данном продукте. 
+    //handleLikeClick вызывает функцию onProductLike, которая добавляет/удаляет продукт из избранного.
+    
     const isLiked = findLike(product, currentUser);
     const handleLikeClick = () => {
         onProductLike(product);
     }
+    
+    //handleDelete вызывает функцию onProductDelete с идентификатором продукта для удаления.
 
     const handleDelete = () => {
         onProductDelete(product._id)
@@ -32,7 +36,7 @@ export const Card = ({
     return (
         <div className="card">
             <div className="card__sticky card__sticky_type_top-left">
-                <span className="card__discount">{discount}%</span>
+                {discount>0 && <span className="card__discount">-{discount}%</span>}
             </div>
             <div className="card__sticky card__sticky_type_top-right">
                 <button 
@@ -46,6 +50,7 @@ export const Card = ({
             <div className="card__desc">
                 <span className="card__price">{price}руб</span>
                 <p className="card__name">{name}</p>
+                <h6 className="card__link">Доступно: {stock} шт.</h6>
             </div>
         </Link>
             <span

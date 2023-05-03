@@ -4,7 +4,7 @@ import { Header } from '../Header/header';
 import './App.scss';
 import { api } from "../../utils/api";
 import { findLike, useDebounce } from "../../utils/utils";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { ProductPage } from "../../pages/Product/ProductPage";
 import { CatalogPage } from "../../pages/Catalog/CatalogPage";
 import { UserContext } from "../../context/userContext.js";
@@ -12,8 +12,6 @@ import { CardContext } from "../../context/cardContext.js";
 import { FaqPage } from "../../pages/FAQ/FaqPage";
 import { NotFound } from "../../pages/NotFound/NotFound";
 import { Favorites } from "../../pages/Favorites/Favorites";
-import { Form } from "../Form/form";
-import { RegistrationForm } from "../Form/RegistrationForm";
 import { Modal } from "../Modal/Modal";
 import { Login } from "../Auth/Login/Login";
 import { Register } from "../Auth/Register/Register";
@@ -28,7 +26,6 @@ function App() {
   const [parentCounter, setParentCounter] = useState(0);
   const [currentUser, setCurrentUser] = useState({})
   const [favorites, setFavorites] = useState([])
-  const [formData, setFormData] = useState([])
   const [activeModal, setShowModal] = useState(false)
   const [isAuthentificated, setIsAuthentificated] = useState(false)
 
@@ -36,7 +33,7 @@ function App() {
  // функция, которая фильтрует продукты по автору (выдает только мои продукты)
   const filteredCards = (products, id) => {
     return products.filter((e) => e.author._id === id);
-    // return products (выводит все продукты)
+    // return products 
   };
 
   //поиск товаров
@@ -86,9 +83,14 @@ function App() {
 
 
   // Первонач загрузка продуктов и данных юзера (когда оба запроса выполнятся успешно)
+  // Promise.all позволяет выполнить несколько асинхронных запросов одновременно
   // Обновление при каждом изменении статуса аутентификации 
+  // если пользователь не авторизован,  то функция завершается
 
   useEffect(() => {
+    if (!isAuthentificated) {
+      return
+    }
     Promise.all([api.getUserInfo(), api.getProductList()]).then(
       ([userData, productData]) => {
         // сетим юзера
@@ -104,15 +106,6 @@ function App() {
     );
   }, [isAuthentificated]);
 
-  // const clickMe = async () => {
-  //   await api.addProduct();
-  // }
-
-  // function userEdit(userUpdate) {
-  //   api.setUserInfo(userUpdate).then((newUserData) => {
-  //     setCurrentUser(newUserData)
-  //   });
-  // }
 
 //Сортировка товаров
 //Функция принимает аргумент sort, который является типом сортировки товаров
@@ -156,8 +149,9 @@ function App() {
 
   const navigate = useNavigate();
 
-  //при каждом срабатывании функции navigate - попытка получения токена из локального хранилища с помощью localStorage.getItem("token")
-  //Если токен найден, то isAuthentificated = true, пользователь аутентифицирован
+  //useEffect следит за navigate 
+  // при каждом апдейте navigate - попытка получить токен из локального хранилища с помощью метода getItem("token")
+  //Если токен найден, то isAuthentificated = true, пользователь авторизован
   useEffect(()=>{
     const token = localStorage.getItem("token")
     if (token) {
